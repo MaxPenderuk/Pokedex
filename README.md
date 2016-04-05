@@ -1,6 +1,6 @@
 # Kotedex
 
-This is my working client side app for http://pokeapi.co/. It was created using ReactJS to render a static `index.html` page which represents info about pokemons. Just follow <b>http://maxpenderuk.github.io/kotedex</b> link to see how it looks like.
+This is my working client side app for http://pokeapi.co/. It was created using ReactJS to render a static `index.html` page which represents info about pokemons. Just follow the <b>http://maxpenderuk.github.io/kotedex</b> link to see how it looks like.
 
 ### Installation
 ```sh
