@@ -1,3 +1,7 @@
+@viewport {
+    orientation: portrait;
+}
+
 a.btn {
     font-size: 10px;
 }
@@ -136,6 +140,10 @@ a.btn {
 }
 
 @media (max-width: 876px) {
+    #poki-img {
+        height: auto;
+    }
+
     .text-center {
         font-size: 18px;
     }
