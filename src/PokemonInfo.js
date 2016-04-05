@@ -9,12 +9,12 @@ class PokemonInfo extends React.Component {
 
   render() {
     const { selected } = this.props;
-    return <div id="info" className="col-sm-3" style={{ top: "15.5%", position: "fixed", right: "6%", bottom: "10%" }}>
-      <span className="col-sm-12 col-xs-12" style={{marginTop: "6px"}} onClick={ this.handleOnClose.bind(this) }>
+    return <div id="info" className="col-sm-3">
+      <span id="btn-close" className="col-sm-12 col-xs-12" onClick={ this.handleOnClose.bind(this) }>
         <button className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </span>
       <div className="thumbnail">
-        <div className="text-center" style={{ height: "120px" }}>
+        <div id="poki-img" className="text-center">
           <a href="#">
             <img src={ selected.img }
             />
@@ -24,7 +24,7 @@ class PokemonInfo extends React.Component {
           <h4 className="text-center">
             { selected.name }
           </h4>
-          <table className="table table-bordered" style={{fontSize: "10px"}}>
+          <table id="custom-t" className="table table-bordered">
             <tbody>
             {
               selected.types.map((type, index) => (

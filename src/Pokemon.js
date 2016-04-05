@@ -106,16 +106,15 @@ class Pokemon extends React.Component {
   render() {
     const {pokemon} = this.state;
     // const pokemon = this.state.pokemon
-    return <div className="col-sm-12">
-      <div className="title center-block"
-           style={{ border: "1px solid #ddd", marginTop: "1%", borderRadius: "4px", width: "50%" }}>
-        <h1 className="text-center">Pokedex</h1>
+    return <div className="col-s-12">
+      <div id="title" className="title center-block">
+        <h1 className="text-center">Kotedex</h1>
       </div>
-      <div className="col-sm-8" style={{ marginTop: "1%", marginBottom: "1%" }}>
+      <div id="poki-list" className="col-s-8">
         { Object.keys(pokemon).slice(0, this.state.page * this.state.perPage)
           .map(id => pokemon[id])
           .map(item =>
-            <div key={item.id} className="col-sm-4" onClick={ (e) => { e.preventDefault(); this.handleOnClick(item) } }>
+            <div key={item.id} className="col-s-4" onClick={ (e) => { e.preventDefault(); this.handleOnClick(item) } }>
               <div className="thumbnail">
                 <div className="text-center" style={{ height: "120px" }}>
                   <a href="#">
