@@ -4,54 +4,65 @@ import request from 'superagent';
 import PokemonInfo from './PokemonInfo';
 import './types_colors.css';
 
-class Pokemon extends React.Component {
+export default class Pokemon extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       page: 1,
-      perPage: 12,
+      offset: 0,
+      limit: 18,
       pokemon: {},
       selected: undefined
     }
   }
 
   componentDidMount() {
+    this.fetchPokemons();
+  }
+
+  fetchPokemons() {
     request
-      .get('http://pokeapi.co/api/v1/pokedex/1/')
+      .get(`https://pokeapi.co/api/v2/pokemon/?limit=${this.state.limit}&offset=${this.state.offset}`)
       .set('Accept', 'application/json')
       .end((err, res) => {
         var pokiObj = {};
-        var pokedex = res.body.pokemon;
+        var pokedex = res.body.results;
+
         for (var val of pokedex) {
-          const id = val['resource_uri'].slice(6).match(/\d+/).toString();
-          if (id <= 718) {
-            pokiObj[id] = {
-              id: id, name: val.name.charAt(0).toUpperCase() + val.name.slice(1),
-              url: "http://pokeapi.co/" + val.resource_uri,
-              img: 'http://pokeapi.co/media/img/' + id + '.png',
-              types: []
-            };
-          }
+          const { name } = val;
+          const { url } = val;
+          const id = url.slice(-3).match(/\d+/).toString();
+
+          pokiObj[id] = {
+            id,
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            url,
+            img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + id + '.png',
+            types: []
+          };
         }
+
         this.setState({
-          pokemon: pokiObj
-        }, () => { this.fetchTypes(); });
+          pokemon:  Object.assign(this.state.pokemon, pokiObj)
+        }, () => {
+          this.fetchTypes();
+        });
       });
   }
 
   fetchTypes() {
     Object.keys(this.state.pokemon)
       .forEach((id, index) => {
-        if (this.state.pokemon[id].types.length > 0 || index > this.state.page * this.state.perPage ) return;
-
         request
           .get(this.state.pokemon[id].url)
           .set('Accept', 'application/json')
           .end((err, res) => {
             const newPokemon = {};
+
             newPokemon[id] = this.state.pokemon[id];
-            newPokemon[id].types = res.body.types;
+            newPokemon[id].types = res.body.types.map(i => i.type);
+
             this.setState({
               pokemon: Object.assign(
                 this.state.pokemon,
@@ -62,31 +73,30 @@ class Pokemon extends React.Component {
       })
   }
 
-  incPage() {
+  loadMore() {
     this.setState({
-      page: this.state.page + 1,
+      offset: this.state.offset + 18
     }, () => {
-      this.fetchTypes();
+      this.fetchPokemons();
     })
   }
   
-  handleOnClick(item) {
+  handleOnClick(item, event) {
+    event.preventDefault();
+
     request
       .get(item.url)
       .set('Accept', 'application/json')
       .end((err, res) => {
+        const { stats } = res.body;
+
         var obj = {
-          name: item.name,
-          img: item.img,
-          types: res.body.types,
-          attack: res.body.attack,
-          defense: res.body.defense,
-          hp: res.body.hp,
-          sp_atk: res.body.sp_atk,
-          sp_def: res.body.sp_def,
-          speed: res.body.speed,
-          weight: res.body.weight,
-          moves: Object.keys(res.body.moves).length
+          name  : item.name,
+          img   : item.img,
+          types : res.body.types.map(i => i.type),
+          stats : res.body.stats,
+          moves : Object.keys(res.body.moves).length,
+          weight: res.body.weight  
         };
 
         this.setState({
@@ -104,17 +114,17 @@ class Pokemon extends React.Component {
   }
 
   render() {
-    const {pokemon} = this.state;
-    // const pokemon = this.state.pokemon
+    const { pokemon } = this.state;
+
     return <div className="col-s-12">
       <div id="title" className="title center-block">
         <h1 className="text-center">Kotedex</h1>
       </div>
       <div id="poki-list" className="col-s-8">
-        { Object.keys(pokemon).slice(0, this.state.page * this.state.perPage)
+        { Object.keys(pokemon)
           .map(id => pokemon[id])
           .map(item =>
-            <div key={item.id} className="col-s-4" onClick={ (e) => { e.preventDefault(); this.handleOnClick(item) } }>
+            <div key={item.id} className="col-s-4" onClick={ this.handleOnClick.bind(this, item) }>
               <div className="thumbnail">
                 <div className="text-center" style={{ height: "120px" }}>
                   <a href="#">
@@ -143,7 +153,7 @@ class Pokemon extends React.Component {
           // If there are pokemons in selected state value -> show `Load more`
           Object.keys(this.state.pokemon).length > 0 ?
             <button className="btn btn-info center-block"
-                    onClick={ this.incPage.bind(this) }>
+                    onClick={ this.loadMore.bind(this) }>
               Load more
             </button>
             : null
@@ -157,5 +167,3 @@ class Pokemon extends React.Component {
     </div>;
   }
 }
-
-export default Pokemon;
