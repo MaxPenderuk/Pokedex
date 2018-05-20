@@ -13,7 +13,8 @@ export default class Pokemon extends React.Component {
       offset: 0,
       limit: 18,
       pokemon: {},
-      selected: undefined
+      selected: undefined,
+      isLoading: false
     }
   }
 
@@ -21,7 +22,7 @@ export default class Pokemon extends React.Component {
     this.fetchPokemons();
   }
 
-  fetchPokemons() {
+  fetchPokemons = () => {
     request
       .get(`https://pokeapi.co/api/v2/pokemon/?limit=${this.state.limit}&offset=${this.state.offset}`)
       .set('Accept', 'application/json')
@@ -51,7 +52,7 @@ export default class Pokemon extends React.Component {
       });
   }
 
-  fetchTypes() {
+  fetchTypes = () => {
     Object.keys(this.state.pokemon)
       .forEach((id, index) => {
         request
@@ -73,7 +74,7 @@ export default class Pokemon extends React.Component {
       })
   }
 
-  loadMore() {
+  handleLoadMoreOnClick = () => {
     this.setState({
       offset: this.state.offset + 18
     }, () => {
@@ -81,10 +82,11 @@ export default class Pokemon extends React.Component {
     })
   }
   
-  handleOnClick(item, event) {
+  handleOnClick = (item, event) => {
     event.preventDefault();
 
-    request
+    this.setState({ isLoading: true }, () => {
+      request
       .get(item.url)
       .set('Accept', 'application/json')
       .end((err, res) => {
@@ -100,13 +102,15 @@ export default class Pokemon extends React.Component {
         };
 
         this.setState({
-          selected: obj
+          selected: obj,
+          isLoading: false
         });
       })
+    });
   }
 
-  handleOnClose(isClosed) {
-    if(isClosed) {
+  handleOnClose = isClosed => {
+    if (isClosed) {
       this.setState({
         selected: undefined
       });
@@ -116,54 +120,74 @@ export default class Pokemon extends React.Component {
   render() {
     const { pokemon } = this.state;
 
-    return <div className="col-s-12">
-      <div id="title" className="title center-block">
-        <h1 className="text-center">Kotedex</h1>
-      </div>
-      <div id="poki-list" className="col-s-8">
-        { Object.keys(pokemon)
-          .map(id => pokemon[id])
-          .map(item =>
-            <div key={item.id} className="col-s-4" onClick={ this.handleOnClick.bind(this, item) }>
-              <div className="thumbnail">
-                <div className="text-center" style={{ height: "120px" }}>
-                  <a href="#">
-                    <img src={ item.img }
-                    />
-                  </a>
-                </div>
-                <div className="caption">
-                  <h4 className="text-center">
-                    { item.name }
-                  </h4>
-                  <p className="types">
-                    { item.types.map((type, index) => (
-                      <a key={index} href="#" className={ "btn " + type.name } role="button">
-                        { type.name.charAt(0).toUpperCase() + type.name.slice(1) }
-                      </a>
-                    )) }
-                  </p>
+    return(
+      <div> <div className='col-s-12'>
+        <div id='title' className='title center-block'>
+          <h1 className='text-center'>Kotedex</h1>
+        </div>
+        <div id='poki-list' className='col-s-8'>
+          {
+            Object.keys(pokemon)
+            .map(id => pokemon[id])
+            .map(item =>
+              <div key={item.id} className='col-s-4' onClick={ this.handleOnClick.bind(null, item) }>
+                <div className='thumbnail'>
+                  <div className='text-center' style={{ height: '120px' }}>
+                    <a href="#">
+                      <img src={ item.img }
+                      />
+                    </a>
+                  </div>
+                  <div className='caption'>
+                    <h4 className='text-center'>
+                      { item.name }
+                    </h4>
+                    <div className="types">
+                    {
+                      item.types.length
+                      ?
+                        item.types.map((type, index) => (
+                          <a key={index} href='#' className={ `btn ${type.name}` } role='button'>
+                            { type.name.charAt(0).toUpperCase() + type.name.slice(1) }
+                          </a>
+                        ))
+                      :
+                        <div className='spinner-wrap'><div className='spinner'/></div>
+                    }
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        }
+            )
+          }
 
+          {
+            // If there are pokemons in selected state value -> show `Load more`
+            Object.keys(pokemon).length > 0 ?
+              <button className='btn btn-info center-block'
+                      onClick={ this.handleLoadMoreOnClick }>
+                Load more
+              </button>
+              : null
+          }
+
+        </div>
         {
-          // If there are pokemons in selected state value -> show `Load more`
-          Object.keys(this.state.pokemon).length > 0 ?
-            <button className="btn btn-info center-block"
-                    onClick={ this.loadMore.bind(this) }>
-              Load more
-            </button>
-            : null
+          this.state.selected !== undefined
+          ? <PokemonInfo selected={ this.state.selected } onClose={ this.handleOnClose.bind(this) } />
+          : null
         }
-
+        </div>
+        {
+          this.state.isLoading
+          ?
+            <div className='page-overlay'>
+              <div className='page-overlay-loader'/>
+              <div className='page-overlay-loader-text'>Loading...</div>
+            </div>
+          : null
+        }
       </div>
-      {
-        this.state.selected !== undefined ? <PokemonInfo selected={ this.state.selected } onClose={ this.handleOnClose.bind(this) } /> : null
-      }
-
-    </div>;
+    );
   }
 }
