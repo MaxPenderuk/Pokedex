@@ -15,6 +15,7 @@
 .spinner-wrap > .spinner {
     width: 28px;
     height: 28px;
+    border: 2px solid #F3F3F3;
     border-top: 2px solid #3498db; /* Blue */
     border-radius: 50%;
     animation: spin 2s linear infinite;
@@ -37,19 +38,23 @@
     margin-right: auto;
     width: 60px;
     height: 60px;
-    border-top: 5px solid #3498db; /* Blue */
+    border: 2px solid #F3F3F3;
+    border-top: 2px solid #3498db; /* Blue */
     border-radius: 50%;
     animation: spin 2s linear infinite;
 }
 
 .page-overlay > .page-overlay-loader-text {
     position: fixed;
+    text-align: center;
+    color: #333;
     width: 63px;
     top: 59%;
     left: 0;
     right: 0;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 5px;
 }
 
 a.btn {

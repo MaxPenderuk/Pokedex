@@ -2,7 +2,7 @@ import React from 'react';
 import request from 'superagent';
 
 import PokemonInfo from './PokemonInfo';
-import './types_colors.css';
+import '../main.css';
 
 export default class Pokemon extends React.Component {
   constructor(props) {
