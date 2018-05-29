@@ -17,8 +17,7 @@ export default class PokemonInfo extends React.Component {
       <div className='thumbnail'>
         <div id='poki-img' className='text-center'>
           <a href='#'>
-            <img src={ selected.img }
-            />
+            <img src={ selected.img } />
           </a>
         </div>
         <div className='caption'>

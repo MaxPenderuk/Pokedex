@@ -45,7 +45,7 @@ export default class Pokemon extends React.Component {
         }
 
         this.setState({
-          pokemon:  Object.assign(this.state.pokemon, pokiObj)
+          pokemon:  Object.assign({}, this.state.pokemon, pokiObj)
         }, () => {
           this.fetchTypes();
         });
@@ -66,6 +66,7 @@ export default class Pokemon extends React.Component {
 
             this.setState({
               pokemon: Object.assign(
+                {},
                 this.state.pokemon,
                 newPokemon
               )
